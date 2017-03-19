@@ -1,5 +1,5 @@
 Feature: Create a CRC card
 
-  Scenario: The class name of the default CRC card
-    Given the class name of the default CRC card
-    Then the class name should be Book
+  Scenario: Create a new CRC card
+    When I create a new CRC card
+    Then the new CRC card should created with the next CRC card id
