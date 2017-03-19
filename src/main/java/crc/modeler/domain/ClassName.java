@@ -1,8 +1,6 @@
 package crc.modeler.domain;
 
 import java.util.Objects;
-import java.util.function.IntPredicate;
-import java.util.stream.Stream;
 
 public class ClassName {
     private String value;
@@ -16,19 +14,12 @@ public class ClassName {
     }
 
     private static String validate(String value) {
-        int first = value.codePointAt(0);
-        boolean anyMatch = Stream.<IntPredicate>of(
-                start -> start == '$',
-                start -> start == '_',
-                Character::isLetter).anyMatch(p -> p.test(first));
-        if (!anyMatch) {
+        if (value == null
+                || !Character.isJavaIdentifierStart(value.codePointAt(0))
+                || value.codePoints().skip(1).anyMatch((codePoint) -> !Character.isJavaIdentifierPart(codePoint))) {
             throw new IllegalArgumentException("This is not a valid class name");
         }
         return value;
-    }
-
-    public boolean contains(String value) {
-        return Objects.equals(this.value, value);
     }
 
     @Override
