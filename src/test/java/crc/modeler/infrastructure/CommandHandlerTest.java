@@ -25,7 +25,8 @@ public class CommandHandlerTest {
                 null,
                 state -> Stream.of(nextEvent),
                 anEventStore,
-                (state, event) -> state);
+                (state, event) -> state,
+                (state1, state2) -> state1);
 
         assertThat(newEvents).containsExactly(nextEvent);
     }
@@ -41,7 +42,8 @@ public class CommandHandlerTest {
                 24L,
                 (Long state) -> state == 24L ? Stream.of(nextEvent) : Stream.<Event>empty(),
                 anEventStore,
-                (state, event) -> state);
+                (state, event) -> state,
+                (state1, state2) -> state1);
 
         assertThat(newEvents).containsExactly(nextEvent);
     }
@@ -58,7 +60,8 @@ public class CommandHandlerTest {
                 24L,
                 (Long state) -> state == 34L ? Stream.of(nextEvent) : Stream.<Event>empty(),
                 anEventStore,
-                (state, event) -> event.hasType("PastEventOccured") ? state + 10L : state);
+                (state, event) -> event.hasType("PastEventOccured") ? state + 10L : state,
+                (state1, state2) -> state1);
 
         assertThat(newEvents).containsExactly(nextEvent);
     }
@@ -68,7 +71,8 @@ public class CommandHandlerTest {
         EventStore anEventStore = createEventStore(Stream.empty(), event -> {
         });
 
-        commandHandler.handleCommand(null, null, anEventStore, (state, event) -> state);
+        commandHandler.handleCommand(null, null, anEventStore,
+                (state, event) -> state, (state1, state2) -> state1);
 
     }
 

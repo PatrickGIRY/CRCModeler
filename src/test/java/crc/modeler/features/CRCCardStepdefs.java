@@ -19,7 +19,7 @@ public class CRCCardStepdefs implements En {
 
         When("^I create a new CRC card$", () ->
                 commandHandler.handleCommand(null, new CreateCRCCard(crcCardId), eventStore,
-                        (state, event) -> state));
+                        (state, event) -> state, (state1, state2) -> state1));
 
         Then("^the new CRC card should created with the next CRC card id$", () -> {
             Stream<Event> pastEvents = eventStore.readEvents();
