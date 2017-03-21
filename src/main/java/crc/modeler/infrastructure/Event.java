@@ -8,13 +8,20 @@ public class Event {
 
     private final Object aggregateId;
 
-    private Event(Object eventType, Object aggregateId) {
+    private final Object data;
+
+    private Event(Object eventType, Object aggregateId, Object data) {
         this.eventType = eventType;
         this.aggregateId = aggregateId;
+        this.data = data;
     }
 
     public static <T, U> Event createEvent(T eventType, U aggregateId) {
-        return new Event(eventType, aggregateId);
+        return createEvent(eventType, aggregateId, null);
+    }
+
+    public static <T, U, V> Event createEvent(T eventType, U aggregateId, V data) {
+        return new Event(eventType, aggregateId, data);
     }
 
     public <T> boolean hasAggregateId(T value) {
@@ -23,6 +30,10 @@ public class Event {
 
     public <T> boolean hasType(T value) {
         return Objects.equals(this.eventType, value);
+    }
+
+    public <T> boolean hasData(T value) {
+        return Objects.equals(this.data, value);
     }
 
     @Override
@@ -44,6 +55,7 @@ public class Event {
         return "Event{" +
                 "eventType=" + eventType +
                 ", aggregateId=" + aggregateId +
+                ", data=" + data +
                 '}';
     }
 }

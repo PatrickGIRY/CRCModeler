@@ -11,7 +11,11 @@ public class CRCCardId {
     }
 
     public static CRCCardId nextCRCCardId() {
-        return new CRCCardId(UUID.randomUUID());
+        return from(UUID.randomUUID());
+    }
+
+    public static CRCCardId from(UUID uuid) {
+        return new CRCCardId(uuid);
     }
 
     @Override
