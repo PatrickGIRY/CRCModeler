@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 
@@ -20,7 +19,9 @@ public class ClassNameTest {
         assumeTrue(part.codePoints().allMatch(Character::isJavaIdentifierPart));
 
         String s = String.valueOf((char) start).concat(part);
-        assertThat(ClassName.of(s)).isNotNull();
+        ClassName className = ClassName.of(s);
+        assertThat(className).isNotNull();
+        assertThat(className.isValid()).isTrue();
     }
 
     @Property
@@ -28,7 +29,9 @@ public class ClassNameTest {
         assumeFalse(Character.isJavaIdentifierStart(codePoint));
 
         String s = String.valueOf((char) codePoint);
-        assertThatThrownBy(() -> ClassName.of(s)).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name");
+        ClassName className = ClassName.of(s);
+        assertThat(className.isValid()).isFalse();
+        className.ifInvalid(e -> assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name"));
     }
 
     @Property
@@ -37,11 +40,15 @@ public class ClassNameTest {
         assumeTrue(part.codePoints().anyMatch((codePoint) -> !Character.isJavaIdentifierPart(codePoint)));
 
         String s = String.valueOf((char) start).concat(part);
-        assertThatThrownBy(() -> ClassName.of(s)).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name");
+        ClassName className = ClassName.of(s);
+        assertThat(className.isValid()).isFalse();
+        className.ifInvalid(e -> assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name"));
     }
 
     @Test
     public void class_name_should_not_craated_when_value_is_null() throws Exception {
-        assertThatThrownBy(() -> ClassName.of(null)).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name");
+        ClassName className = ClassName.of(null);
+        assertThat(className.isValid()).isFalse();
+        className.ifInvalid(e -> assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name"));
     }
 }
