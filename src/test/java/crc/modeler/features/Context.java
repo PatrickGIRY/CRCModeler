@@ -11,6 +11,6 @@ public class Context {
     }
 
     CRCCardId defaultCRCCardId() {
-        return CRCCardId.from(defaultUUID());
+        return CRCCardId.fromUUID(defaultUUID());
     }
 }

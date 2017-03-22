@@ -28,7 +28,7 @@ public class CRCCardStepdefs implements En {
 
         Then("^the CRC card id should be ([a-f|0-9|\\-]+)$", (UUID uuid) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
-            assertThat(pastEvents.filter(event -> event.hasAggregateId(CRCCardId.from(uuid)))
+            assertThat(pastEvents.filter(event -> event.hasAggregateId(CRCCardId.fromUUID(uuid)))
                     .anyMatch(event -> event.hasType(EventType.CRCCardCreated))).isTrue();
         });
 
