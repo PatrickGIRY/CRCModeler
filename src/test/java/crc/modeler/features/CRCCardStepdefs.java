@@ -2,9 +2,9 @@ package crc.modeler.features;
 
 import crc.modeler.application.AddClassNameToCRCCard;
 import crc.modeler.application.CreateCRCCard;
+import crc.modeler.common.Result;
 import crc.modeler.domain.CRCCardId;
 import crc.modeler.domain.ClassName;
-import crc.modeler.domain.EventType;
 import crc.modeler.infrastructure.CommandHandler;
 import crc.modeler.infrastructure.Event;
 import cucumber.api.java8.En;
@@ -12,6 +12,9 @@ import cucumber.api.java8.En;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static crc.modeler.domain.EventType.CRCCardClassNameAdded;
+import static crc.modeler.domain.EventType.CRCCardClassNameRejected;
+import static crc.modeler.domain.EventType.CRCCardCreated;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CRCCardStepdefs implements En {
@@ -29,7 +32,7 @@ public class CRCCardStepdefs implements En {
         Then("^the CRC card id should be ([a-f|0-9|\\-]+)$", (UUID uuid) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
             assertThat(pastEvents.filter(event -> event.hasAggregateId(CRCCardId.fromUUID(uuid)))
-                    .anyMatch(event -> event.hasType(EventType.CRCCardCreated))).isTrue();
+                    .anyMatch(event -> event.hasType(CRCCardCreated))).isTrue();
         });
 
         When("^I create a new CRC card$", () ->
@@ -39,21 +42,22 @@ public class CRCCardStepdefs implements En {
         Then("^the new CRC card should created with the next CRC card id$", () -> {
             Stream<Event> pastEvents = eventStore.readEvents();
             assertThat(pastEvents.filter(event -> event.hasAggregateId(crcCardId))
-                    .anyMatch(event -> event.hasType(EventType.CRCCardCreated))).isTrue();
+                    .anyMatch(event -> event.hasType(CRCCardCreated))).isTrue();
         });
 
-        When("^I add class name (.*) to the CRC card$", (String value) ->
-                ClassName.of(value).onSuccess(className ->
-                        commandHandler.handleCommand(null,
-                                new AddClassNameToCRCCard(context.defaultCRCCardId(), className),
-                        eventStore,
-                                (state, event) -> state, (state1, state2) -> state1)));
+        When("^I add class name (.*) to the CRC card$", (String value) -> {
+            Result<ClassName> className = ClassName.of(value);
+            commandHandler.handleCommand(null,
+                    new AddClassNameToCRCCard(context.defaultCRCCardId(), className),
+                    eventStore,
+                    (state, event) -> state, (state1, state2) -> state1);
+        });
 
         Then("^The class name (.*) should be added to the default CRC card$", (String value) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
             assertThat(pastEvents
                     .filter(event -> event.hasAggregateId(context.defaultCRCCardId()))
-                    .filter(event -> event.hasType(EventType.CRCCardClassNameAdded))
+                    .filter(event -> event.hasType(CRCCardClassNameAdded))
                     .anyMatch(event -> event.hasData(ClassName.of(value).successValue()))).isTrue();
         });
 
@@ -61,7 +65,7 @@ public class CRCCardStepdefs implements En {
             Stream<Event> pastEvents = eventStore.readEvents();
             assertThat(pastEvents
                     .filter(event -> event.hasAggregateId(context.defaultCRCCardId()))
-                    .filter(event -> event.hasType(EventType.CRCCardClassNameRejected))
+                    .filter(event -> event.hasType(CRCCardClassNameRejected))
                     .anyMatch(event -> event.hasData("This is not a valid class name"))).isTrue();
         });
 
