@@ -33,6 +33,8 @@ public abstract class Result<T> {
 
     public abstract void onSuccess(Consumer<T> consumer);
 
+    public abstract <R> R mapOnFailure(Function<RuntimeException, R> mapper);
+
 
     private static class Success<T> extends Result<T> {
 
@@ -91,6 +93,12 @@ public abstract class Result<T> {
         }
 
         @Override
+        @SuppressWarnings("unchecked")
+        public <R> R mapOnFailure(Function<RuntimeException, R> mapper) {
+            return (R) value;
+        }
+
+        @Override
         public String toString() {
             return "Success{" +
                     "value=" + value +
@@ -144,6 +152,11 @@ public abstract class Result<T> {
         @Override
         public void onSuccess(Consumer<T> consumer) {
 
+        }
+
+        @Override
+        public <R> R mapOnFailure(Function<RuntimeException, R> mapper) {
+            return mapper.apply(exception);
         }
 
         @Override

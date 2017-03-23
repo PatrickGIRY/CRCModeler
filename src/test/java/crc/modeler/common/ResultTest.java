@@ -103,4 +103,17 @@ public class ResultTest {
         result.onSuccess(stringWriter::write);
         assertThat(stringWriter.toString()).isEmpty();
     }
+
+    @Test
+    public void should_not_map_on_failure_when_success_occured() throws Exception {
+        Result<String> result = Result.success("foo");
+        assertThat(result.<String>mapOnFailure(e -> "bar")).isEqualTo("foo");
+    }
+
+    @Test
+    public void should_map_on_failure_when_failure_occured() throws Exception {
+        RuntimeException exception = new RuntimeException("foo");
+        Result<String> result = Result.failure(exception);
+        assertThat(result.<String>mapOnFailure(e -> "bar")).isEqualTo("bar");
+    }
 }
