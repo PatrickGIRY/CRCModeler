@@ -1,6 +1,7 @@
 package crc.modeler.common;
 
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -29,6 +30,8 @@ public abstract class Result<T> {
     public abstract <R> Result<R> map(Function<T, R> mapper);
 
     public abstract <R> Result<R> flatMap(Function<T, Result<R>> mapper);
+
+    public abstract void onSuccess(Consumer<T> consumer);
 
 
     private static class Success<T> extends Result<T> {
@@ -83,6 +86,11 @@ public abstract class Result<T> {
         }
 
         @Override
+        public void onSuccess(Consumer<T> consumer) {
+            consumer.accept(this.value);
+        }
+
+        @Override
         public String toString() {
             return "Success{" +
                     "value=" + value +
@@ -131,6 +139,11 @@ public abstract class Result<T> {
         @Override
         public <R> Result<R> flatMap(Function<T, Result<R>> mapper) {
             return Result.failure(exception);
+        }
+
+        @Override
+        public void onSuccess(Consumer<T> consumer) {
+
         }
 
         @Override

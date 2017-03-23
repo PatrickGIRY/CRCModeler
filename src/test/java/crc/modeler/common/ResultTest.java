@@ -2,6 +2,8 @@ package crc.modeler.common;
 
 import org.junit.Test;
 
+import java.io.StringWriter;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -14,7 +16,6 @@ public class ResultTest {
         assertThat(result.isFailure()).isFalse();
         assertThat(result.successValue()).isEqualTo("foo");
         assertThatThrownBy(result::failureValue).isInstanceOf(UnsupportedOperationException.class);
-
     }
 
     @Test
@@ -84,5 +85,22 @@ public class ResultTest {
         Result<String> result = Result.failure(exception);
         assertThat(result.flatMap(s -> Result.success("bar"))).extracting(Result::failureValue)
                 .containsExactly(exception);
+    }
+
+    @Test
+    public void should_call_consumer_on_success() throws Exception {
+        Result<String> result = Result.success("foo");
+        StringWriter stringWriter = new StringWriter();
+        result.onSuccess(stringWriter::write);
+        assertThat(stringWriter.toString()).isEqualTo("foo");
+    }
+
+    @Test
+    public void should_not_call_consumer_on_failure() throws Exception {
+        RuntimeException exception = new RuntimeException("foo");
+        Result<String> result = Result.failure(exception);
+        StringWriter stringWriter = new StringWriter();
+        result.onSuccess(stringWriter::write);
+        assertThat(stringWriter.toString()).isEmpty();
     }
 }
