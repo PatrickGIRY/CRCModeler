@@ -2,6 +2,7 @@ package crc.modeler.domain;
 
 import com.pholser.junit.quickcheck.Property;
 import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
+import crc.modeler.common.Result;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -19,9 +20,10 @@ public class ClassNameTest {
         assumeTrue(part.codePoints().allMatch(Character::isJavaIdentifierPart));
 
         String s = String.valueOf((char) start).concat(part);
-        ClassName className = ClassName.of(s);
+        Result<ClassName> className = ClassName.of(s);
         assertThat(className).isNotNull();
-        assertThat(className.isValid()).isTrue();
+        assertThat(className.isSuccess()).isTrue();
+        assertThat(className.successValue()).extracting(ClassName::value).containsExactly(s);
     }
 
     @Property
@@ -29,9 +31,10 @@ public class ClassNameTest {
         assumeFalse(Character.isJavaIdentifierStart(codePoint));
 
         String s = String.valueOf((char) codePoint);
-        ClassName className = ClassName.of(s);
-        assertThat(className.isValid()).isFalse();
-        className.ifInvalid(e -> assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name"));
+        Result<ClassName> className = ClassName.of(s);
+        assertThat(className.isFailure()).isTrue();
+        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("This is not a valid class name");
     }
 
     @Property
@@ -40,15 +43,17 @@ public class ClassNameTest {
         assumeTrue(part.codePoints().anyMatch((codePoint) -> !Character.isJavaIdentifierPart(codePoint)));
 
         String s = String.valueOf((char) start).concat(part);
-        ClassName className = ClassName.of(s);
-        assertThat(className.isValid()).isFalse();
-        className.ifInvalid(e -> assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name"));
+        Result<ClassName> className = ClassName.of(s);
+        assertThat(className.isFailure()).isTrue();
+        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("This is not a valid class name");
     }
 
     @Test
     public void class_name_should_not_craated_when_value_is_null() throws Exception {
-        ClassName className = ClassName.of(null);
-        assertThat(className.isValid()).isFalse();
-        className.ifInvalid(e -> assertThat(e).isInstanceOf(IllegalArgumentException.class).hasMessage("This is not a valid class name"));
+        Result<ClassName> className = ClassName.of(null);
+        assertThat(className.isFailure()).isTrue();
+        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("This is not a valid class name");
     }
 }

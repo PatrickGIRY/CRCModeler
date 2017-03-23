@@ -1,87 +1,51 @@
 package crc.modeler.domain;
 
 
-import java.util.Objects;
-import java.util.function.Consumer;
+import crc.modeler.common.Result;
 
-public abstract class ClassName {
+public class ClassName {
 
-    private ClassName() {}
+    private final String value;
 
-    public static ClassName of(String value) {
-        final ClassName className;
+    public static Result<ClassName> of(String value) {
+        final Result<ClassName> className;
         if (value != null
                 && Character.isJavaIdentifierStart(value.codePointAt(0))
                 && value.codePoints().skip(1).allMatch(Character::isJavaIdentifierPart)) {
-            className = new Validated(value);
+            className = Result.success(new ClassName(value));
         } else {
-            className = new Invalid(new IllegalArgumentException("This is not a valid class name"));
+            className = Result.failure(new IllegalArgumentException("This is not a valid class name"));
         }
         return className;
     }
 
-    public abstract boolean isValid();
-
-    public abstract void ifInvalid(Consumer<RuntimeException> consumer);
-
-    private static class Invalid extends ClassName {
-        private final RuntimeException error;
-
-        private Invalid(RuntimeException error) {
-            super();
-            this.error = error;
-        }
-
-        @Override
-        public boolean isValid() {
-            return false;
-        }
-
-        @Override
-        public void ifInvalid(Consumer<RuntimeException> consumer) {
-            consumer.accept(error);
-        }
-
-        @Override
-        public String toString() {
-            return "ClassNameInvalid{" +
-                    error +
-                    '}';
-        }
+    private ClassName(String value) {
+        this.value = value;
     }
 
-    private static class Validated extends ClassName {
-        private String value;
+    public String value() {
+        return this.value;
+    }
 
-        private Validated(String value) {
-            super();
-            this.value = value;
-        }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-        public boolean isValid() {
-            return true;
-        }
+        ClassName className = (ClassName) o;
 
-        public void ifInvalid(Consumer<RuntimeException> consumer) {
+        return value != null ? value.equals(className.value) : className.value == null;
+    }
 
-        }
+    @Override
+    public int hashCode() {
+        return value != null ? value.hashCode() : 0;
+    }
 
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Validated validatedClassName = (Validated) o;
-            return Objects.equals(value, validatedClassName.value);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(value);
-        }
-
-        @Override
-        public String toString() {
-            return value;
-        }
+    @Override
+    public String toString() {
+        return "ClassName{" +
+                "value='" + value + '\'' +
+                '}';
     }
 }

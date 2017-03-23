@@ -43,8 +43,9 @@ public class CRCCardStepdefs implements En {
         });
 
         When("^I add class name (.*) to the CRC card$", (String className) ->
+
                 commandHandler.handleCommand(null,
-                        new AddClassNameToCRCCard(context.defaultCRCCardId(), ClassName.of(className)),
+                        new AddClassNameToCRCCard(context.defaultCRCCardId(), ClassName.of(className).successValue()),
                         eventStore,
                         (state, event) -> state, (state1, state2) -> state1));
 
@@ -53,7 +54,7 @@ public class CRCCardStepdefs implements En {
             assertThat(pastEvents
                     .filter(event -> event.hasAggregateId(context.defaultCRCCardId()))
                     .filter(event -> event.hasType(EventType.CRCCardClassNameAdded))
-                    .anyMatch(event -> event.hasData(ClassName.of(className)))).isTrue();
+                    .anyMatch(event -> event.hasData(ClassName.of(className).successValue()))).isTrue();
         });
 
         Then("^the class name (.*) should be rejected$", (String className) -> {
