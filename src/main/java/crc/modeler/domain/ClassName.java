@@ -7,20 +7,24 @@ public class ClassName {
 
     private final String value;
 
+    private ClassName(String value) {
+        this.value = value;
+    }
+
     public static Result<ClassName> of(String value) {
         final Result<ClassName> className;
-        if (value != null
-                && Character.isJavaIdentifierStart(value.codePointAt(0))
-                && value.codePoints().skip(1).allMatch(Character::isJavaIdentifierPart)) {
-            className = Result.success(new ClassName(value));
+        if (value != null) {
+            int startCodePoint = value.codePointAt(0);
+            if (Character.isJavaIdentifierStart(startCodePoint) && !Character.isLowerCase(startCodePoint)
+                    && value.codePoints().skip(1).allMatch(Character::isJavaIdentifierPart)) {
+                className = Result.success(new ClassName(value));
+            } else {
+                className = Result.failure(new IllegalArgumentException("This is not a valid class name"));
+            }
         } else {
             className = Result.failure(new IllegalArgumentException("This is not a valid class name"));
         }
         return className;
-    }
-
-    private ClassName(String value) {
-        this.value = value;
     }
 
     public String value() {
