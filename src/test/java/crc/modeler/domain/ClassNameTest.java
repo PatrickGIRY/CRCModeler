@@ -34,7 +34,7 @@ public class ClassNameTest {
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
         assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("This is not a valid class name");
+                .hasMessage(String.format("'%s' is not a valid class name", s));
     }
 
     @Property
@@ -45,7 +45,7 @@ public class ClassNameTest {
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
         assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("This is not a valid class name");
+                .hasMessage(String.format("'%s' is not a valid class name", s));
     }
 
     @Property
@@ -57,7 +57,7 @@ public class ClassNameTest {
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
         assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("This is not a valid class name");
+                .hasMessage(String.format("'%s' is not a valid class name", s));
     }
 
     @Test

@@ -19,7 +19,7 @@ public class ClassName {
                     && value.codePoints().skip(1).allMatch(Character::isJavaIdentifierPart)) {
                 className = Result.success(new ClassName(value));
             } else {
-                className = Result.failure(new IllegalArgumentException("This is not a valid class name"));
+                className = Result.failure(new IllegalArgumentException(String.format("'%s' is not a valid class name", value)));
             }
         } else {
             className = Result.failure(new IllegalArgumentException("This is not a valid class name"));

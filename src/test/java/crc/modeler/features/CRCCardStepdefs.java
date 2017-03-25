@@ -61,12 +61,12 @@ public class CRCCardStepdefs implements En {
                     .anyMatch(event -> event.hasData(ClassName.of(value).successValue()))).isTrue();
         });
 
-        Then("^the class name (.*) should be rejected$", (String className) -> {
+        Then("^the class name (.*) should be rejected with the message (.+)$", (String className, String message) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
             assertThat(pastEvents
                     .filter(event -> event.hasAggregateId(context.defaultCRCCardId()))
                     .filter(event -> event.hasType(CRCCardClassNameRejected))
-                    .anyMatch(event -> event.hasData("This is not a valid class name"))).isTrue();
+                    .anyMatch(event -> event.hasData(message))).isTrue();
         });
 
     }
