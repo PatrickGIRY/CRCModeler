@@ -16,12 +16,13 @@ import static crc.modeler.domain.EventType.CRCCardClassNameAdded;
 import static crc.modeler.domain.EventType.CRCCardClassNameRejected;
 import static crc.modeler.domain.EventType.CRCCardCreated;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.groups.Tuple.tuple;
 
 public class CRCCardStepdefs implements En {
 
     public CRCCardStepdefs(CommandHandler commandHandler, CurrentEventStore eventStore, Context context) {
 
-        CRCCardId crcCardId = CRCCardId.nextCRCCardId();
+        CRCCardId newCRCCardId = CRCCardId.nextCRCCardId();
 
         Given("^a default CRC card$", () ->
                 commandHandler.handleCommand(null, new CreateCRCCard(context.defaultCRCCardId()),
@@ -31,18 +32,19 @@ public class CRCCardStepdefs implements En {
 
         Then("^the CRC card id should be ([a-f|0-9|\\-]+)$", (UUID uuid) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
-            assertThat(pastEvents.filter(event -> event.hasAggregateId(CRCCardId.fromUUID(uuid)))
-                    .anyMatch(event -> event.hasType(CRCCardCreated))).isTrue();
+            assertThat(pastEvents).extracting(Event::getAggregateId, Event::getEventType, Event::getData)
+                    .containsExactly(tuple(CRCCardId.fromUUID(uuid), CRCCardCreated, null));
         });
 
         When("^I create a new CRC card$", () ->
-                commandHandler.handleCommand(null, new CreateCRCCard(crcCardId), eventStore,
+                commandHandler.handleCommand(null, new CreateCRCCard(newCRCCardId), eventStore,
                         (state, event) -> state, (state1, state2) -> state1));
 
         Then("^the new CRC card should created with the next CRC card id$", () -> {
             Stream<Event> pastEvents = eventStore.readEvents();
-            assertThat(pastEvents.filter(event -> event.hasAggregateId(crcCardId))
-                    .anyMatch(event -> event.hasType(CRCCardCreated))).isTrue();
+            assertThat(pastEvents)
+                    .extracting(Event::getAggregateId, Event::getEventType, Event::getData)
+                    .containsExactly(tuple(newCRCCardId, CRCCardCreated, null));
         });
 
         When("^I add class name (.*) to the CRC card$", (String value) -> {
@@ -55,19 +57,18 @@ public class CRCCardStepdefs implements En {
 
         Then("^The class name (.*) should be added to the default CRC card$", (String value) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
-            assertThat(pastEvents
-                    .filter(event -> event.hasAggregateId(context.defaultCRCCardId()))
-                    .filter(event -> event.hasType(CRCCardClassNameAdded))
-                    .anyMatch(event -> event.hasData(ClassName.of(value).successValue()))).isTrue();
+            assertThat(pastEvents).extracting(Event::getAggregateId, Event::getEventType, Event::getData)
+                    .containsExactly(
+                            tuple(context.defaultCRCCardId(), CRCCardCreated, null),
+                            tuple(context.defaultCRCCardId(), CRCCardClassNameAdded, ClassName.of(value).successValue()));
         });
 
         Then("^the class name (.*) should be rejected with the message (.+)$", (String className, String message) -> {
             Stream<Event> pastEvents = eventStore.readEvents();
-            assertThat(pastEvents
-                    .filter(event -> event.hasAggregateId(context.defaultCRCCardId()))
-                    .filter(event -> event.hasType(CRCCardClassNameRejected))
-                    .anyMatch(event -> event.hasData(message))).isTrue();
+            assertThat(pastEvents).extracting(Event::getAggregateId, Event::getEventType, Event::getData)
+                    .containsExactly(
+                            tuple(context.defaultCRCCardId(), CRCCardCreated, null),
+                            tuple(context.defaultCRCCardId(), CRCCardClassNameRejected, message));
         });
-
     }
 }

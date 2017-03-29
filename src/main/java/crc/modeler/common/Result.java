@@ -1,6 +1,7 @@
 package crc.modeler.common;
 
 
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -99,6 +100,19 @@ public abstract class Result<T> {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Success<?> success = (Success<?>) o;
+            return Objects.equals(value, success.value);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(value);
+        }
+
+        @Override
         public String toString() {
             return "Success{" +
                     "value=" + value +
@@ -157,6 +171,19 @@ public abstract class Result<T> {
         @Override
         public <R> R mapOnFailure(Function<RuntimeException, R> mapper) {
             return mapper.apply(exception);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Failure<?> failure = (Failure<?>) o;
+            return Objects.equals(exception, failure.exception);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(exception);
         }
 
         @Override

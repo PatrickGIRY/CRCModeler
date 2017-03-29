@@ -24,16 +24,16 @@ public class Event {
         return new Event(eventType, aggregateId, data);
     }
 
-    public <T> boolean hasAggregateId(T value) {
-        return Objects.equals(this.aggregateId, value);
+    public Object getEventType() {
+        return eventType;
     }
 
-    public <T> boolean hasType(T value) {
-        return Objects.equals(this.eventType, value);
+    public Object getAggregateId() {
+        return aggregateId;
     }
 
-    public <T> boolean hasData(T value) {
-        return Objects.equals(this.data, value);
+    public Object getData() {
+        return data;
     }
 
     @Override
