@@ -14,18 +14,16 @@ public class CommandHandlerTest {
 
     private static final long AGGREGATE_ID = 10L;
 
-    private CommandHandler commandHandler = new CommandHandler();
-
     @Test
     public void should_append_event_created_by_decide_for_command() throws Exception {
         Event nextEvent = Event.createEvent("EventOccured", AGGREGATE_ID);
         List<Event> newEvents = new ArrayList<>();
-        EventStore anEventStore = createEventStore(Stream.empty(), newEvents::add);
+        EventStore eventStore = createEventStore(Stream.empty(), newEvents::add);
+        CommandHandler commandHandler = new CommandHandler(eventStore);
 
         commandHandler.handleCommand(
                 null,
                 state -> Stream.of(nextEvent),
-                anEventStore,
                 (state, event) -> state,
                 (state1, state2) -> state1);
 
@@ -37,12 +35,12 @@ public class CommandHandlerTest {
 
         Event nextEvent = Event.createEvent("EventOccured", AGGREGATE_ID);
         List<Event> newEvents = new ArrayList<>();
-        EventStore anEventStore = createEventStore(Stream.empty(), newEvents::add);
+        EventStore eventStore = createEventStore(Stream.empty(), newEvents::add);
+        CommandHandler commandHandler = new CommandHandler(eventStore);
 
         commandHandler.handleCommand(
                 24L,
                 (Long state) -> state == 24L ? Stream.of(nextEvent) : Stream.<Event>empty(),
-                anEventStore,
                 (state, event) -> state,
                 (state1, state2) -> state1);
 
@@ -55,12 +53,12 @@ public class CommandHandlerTest {
         Event pastEvent = Event.createEvent("PastEventOccured", AGGREGATE_ID);
         Event nextEvent = Event.createEvent("EventOccured", AGGREGATE_ID);
         List<Event> newEvents = new ArrayList<>();
-        EventStore anEventStore = createEventStore(Stream.of(pastEvent), newEvents::add);
+        EventStore eventStore = createEventStore(Stream.of(pastEvent), newEvents::add);
+        CommandHandler commandHandler = new CommandHandler(eventStore);
 
         commandHandler.handleCommand(
                 24L,
                 (Long state) -> state == 34L ? Stream.of(nextEvent) : Stream.<Event>empty(),
-                anEventStore,
                 (state, event) -> Objects.equals("PastEventOccured", event.getEventType()) ? state + 10L : state,
                 (state1, state2) -> state1);
 
@@ -69,10 +67,11 @@ public class CommandHandlerTest {
 
     @Test
     public void should_do_nothing_when_command_the_handle_is_null() throws Exception {
-        EventStore anEventStore = createEventStore(Stream.empty(), event -> {
+        EventStore eventStore = createEventStore(Stream.empty(), event -> {
         });
+        CommandHandler commandHandler = new CommandHandler(eventStore);
 
-        commandHandler.handleCommand(null, null, anEventStore,
+        commandHandler.handleCommand(null, null,
                 (state, event) -> state, (state1, state2) -> state1);
 
     }

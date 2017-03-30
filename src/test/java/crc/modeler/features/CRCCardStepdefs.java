@@ -26,7 +26,6 @@ public class CRCCardStepdefs implements En {
 
         Given("^a default CRC card$", () ->
                 commandHandler.handleCommand(null, new CreateCRCCard(context.defaultCRCCardId()),
-                        eventStore,
                         (state, event) -> state,
                         (state1, state2) -> state1));
 
@@ -37,7 +36,7 @@ public class CRCCardStepdefs implements En {
         });
 
         When("^I create a new CRC card$", () ->
-                commandHandler.handleCommand(null, new CreateCRCCard(newCRCCardId), eventStore,
+                commandHandler.handleCommand(null, new CreateCRCCard(newCRCCardId),
                         (state, event) -> state, (state1, state2) -> state1));
 
         Then("^the new CRC card should created with the next CRC card id$", () -> {
@@ -51,7 +50,6 @@ public class CRCCardStepdefs implements En {
             Result<ClassName> className = ClassName.of(value);
             commandHandler.handleCommand(null,
                     new AddClassNameToCRCCard(context.defaultCRCCardId(), className),
-                    eventStore,
                     (state, event) -> state, (state1, state2) -> state1);
         });
 

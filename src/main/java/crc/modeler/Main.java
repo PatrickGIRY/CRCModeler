@@ -21,12 +21,11 @@ public class Main {
 
     public static void main(String[] args) {
 
-        CommandHandler commandHandler = new CommandHandler();
         EventStore eventStore = new FileEventStore(Paths.get("data.eventstore"));
+        CommandHandler commandHandler = new CommandHandler(eventStore);
         List<CommandMatcher> commandMatchers = Arrays.asList(
                 new CommandMatcher(Pattern.compile("^new$"), line -> commandHandler.handleCommand(
                         null, new CreateCRCCard(CRCCardId.nextCRCCardId()),
-                        eventStore,
                         (state, event) -> state, (state1, state2) -> state1)),
                 new CommandMatcher(Pattern.compile("^quit$"), line -> System.exit(0))
         );
