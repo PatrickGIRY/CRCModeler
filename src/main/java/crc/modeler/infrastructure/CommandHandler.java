@@ -7,7 +7,14 @@ import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
 
 public class CommandHandler {
-    public <T> Collection<Event> handleCommand(T initialState, Command<T> command, EventStore eventStore,
+
+    private final EventStore eventStore;
+
+    public CommandHandler(EventStore eventStore) {
+        this.eventStore = eventStore;
+    }
+
+    public <T> Collection<Event> handleCommand(T initialState, Command<T> command,
                                                BiFunction<T, Event, T> evolve, BinaryOperator<T> statesCombiner) {
         if (command != null) {
             Stream<Event> pastEvents = eventStore.readEvents();
@@ -19,5 +26,4 @@ public class CommandHandler {
             return Collections.emptyList();
         }
     }
-
 }

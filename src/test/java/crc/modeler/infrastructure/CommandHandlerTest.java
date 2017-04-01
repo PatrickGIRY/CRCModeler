@@ -15,8 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class CommandHandlerTest {
 
     private static final long AGGREGATE_ID = 10L;
-
-    private CommandHandler commandHandler = new CommandHandler();
     private List<Event> newEventsAppended;
 
     @Before
@@ -28,11 +26,12 @@ public class CommandHandlerTest {
     public void should_append_event_created_by_decide_for_command() throws Exception {
         Event nextEvent = Event.createEvent("EventOccured", AGGREGATE_ID);
         EventStore anEventStore = createEventStore(Stream.empty());
+        CommandHandler commandHandler = new CommandHandler(anEventStore);
+
 
         Collection<Event> newEvents = commandHandler.handleCommand(
                 null,
                 state -> Collections.singletonList(nextEvent),
-                anEventStore,
                 (state, event) -> state,
                 (state1, state2) -> state1);
 
@@ -45,11 +44,10 @@ public class CommandHandlerTest {
 
         Event nextEvent = Event.createEvent("EventOccured", AGGREGATE_ID);
         EventStore anEventStore = createEventStore(Stream.empty());
-
+        CommandHandler commandHandler = new CommandHandler(anEventStore);
         Collection<Event> newEvents = commandHandler.handleCommand(
                 24L,
                 (Long state) -> state == 24L ? Collections.singletonList(nextEvent) : Collections.<Event>emptyList(),
-                anEventStore,
                 (state, event) -> state,
                 (state1, state2) -> state1);
 
@@ -63,11 +61,11 @@ public class CommandHandlerTest {
         Event pastEvent = Event.createEvent("PastEventOccured", AGGREGATE_ID);
         Event nextEvent = Event.createEvent("EventOccured", AGGREGATE_ID);
         EventStore anEventStore = createEventStore(Stream.of(pastEvent));
+        CommandHandler commandHandler = new CommandHandler(anEventStore);
 
         Collection<Event> newEvents = commandHandler.handleCommand(
                 24L,
                 (Long state) -> state == 34L ? Collections.singletonList(nextEvent) : Collections.<Event>emptyList(),
-                anEventStore,
                 (state, event) -> Objects.equals("PastEventOccured", event.getEventType()) ? state + 10L : state,
                 (state1, state2) -> state1);
 
@@ -78,9 +76,11 @@ public class CommandHandlerTest {
     @Test
     public void should_do_nothing_when_command_the_handle_is_null() throws Exception {
         EventStore anEventStore = createEventStore(Stream.empty());
-
-        Collection<Event> newEvents = commandHandler.handleCommand(null, null, anEventStore,
-                (state, event) -> state, (state1, state2) -> state1);
+        CommandHandler commandHandler = new CommandHandler(anEventStore);
+        Collection<Event> newEvents = commandHandler.handleCommand(
+                null, null,
+                (state, event) -> state,
+                (state1, state2) -> state1);
         assertThat(newEvents).isEmpty();
 
     }
