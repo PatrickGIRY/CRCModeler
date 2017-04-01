@@ -38,9 +38,8 @@ public class ClassNameTest {
     }
 
     @Property
-    public void class_name_should_not_created_when_value_start_by_lowercase_code_point(@CodePoint int codePoint) throws Exception {
-        assumeTrue(Character.isLowerCase(codePoint));
-
+    public void class_name_should_not_created_when_value_start_by_lowercase_code_point(@Lowercase int codePoint) throws Exception {
+        
         String s = String.valueOf((char) codePoint);
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
