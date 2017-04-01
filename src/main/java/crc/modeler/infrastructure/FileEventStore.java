@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -42,9 +43,9 @@ public class FileEventStore implements EventStore {
     }
 
     @Override
-    public void appendEvents(Stream<Event> nextEvents) {
+    public void appendEvents(Collection<Event> nextEvents) {
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path, CHARSET, CREATE, APPEND)) {
-            nextEvents.map(this::toRecord).forEach(record -> {
+            nextEvents.stream().map(this::toRecord).forEach(record -> {
                 try {
                     bufferedWriter.write(record);
                 } catch (IOException e) {

@@ -1,7 +1,7 @@
 package crc.modeler.infrastructure;
 
-import java.util.stream.Stream;
+import java.util.Collection;
 
 public interface Command<T> {
-    Stream<Event> decide(T state);
+    Collection<Event> decide(T state);
 }

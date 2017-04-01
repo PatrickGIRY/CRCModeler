@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -25,7 +27,7 @@ public class FileEventStoreTest {
         LOGGER.info("temporary file path {}", path);
         FileEventStore eventStore = new FileEventStore(path);
         Event event = Event.createEvent("CREATED", UUID.randomUUID());
-        eventStore.appendEvents(Stream.of(event));
+        eventStore.appendEvents(Collections.singletonList(event));
         Stream<Event> events = eventStore.readEvents();
         assertThat(events).extracting(Event::getEventType, Event::getAggregateId)
                 .containsExactly(tuple(event.getEventType(), event.getAggregateId()));
@@ -40,7 +42,7 @@ public class FileEventStoreTest {
         UUID aggregateId = UUID.randomUUID();
         Event event1 = Event.createEvent("CREATED", aggregateId);
         Event event2 = Event.createEvent("UPDATED", aggregateId);
-        eventStore.appendEvents(Stream.of(event1, event2));
+        eventStore.appendEvents(Arrays.asList(event1, event2));
         Stream<Event> events = eventStore.readEvents();
         assertThat(events).extracting(Event::getEventType, Event::getAggregateId)
                 .containsExactly(

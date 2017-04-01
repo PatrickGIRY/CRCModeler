@@ -6,7 +6,8 @@ import crc.modeler.domain.ClassName;
 import crc.modeler.infrastructure.Command;
 import crc.modeler.infrastructure.Event;
 
-import java.util.stream.Stream;
+import java.util.Collection;
+import java.util.Collections;
 
 import static crc.modeler.domain.EventType.CRCCardClassNameAdded;
 import static crc.modeler.domain.EventType.CRCCardClassNameRejected;
@@ -21,12 +22,12 @@ public class AddClassNameToCRCCard implements Command<CRCCardId> {
     }
 
     @Override
-    public Stream<Event> decide(CRCCardId state) {
-        return className
+    public Collection<Event> decide(CRCCardId state) {
+        return Collections.singletonList(className
                 .map(validatedClassName ->
-                        Stream.of(Event.createEvent(CRCCardClassNameAdded, crcCardId, validatedClassName)))
+                        Event.createEvent(CRCCardClassNameAdded, crcCardId, validatedClassName))
                 .mapOnFailure(error ->
-                        Stream.of(Event.createEvent(CRCCardClassNameRejected, crcCardId, error.getMessage())));
+                        Event.createEvent(CRCCardClassNameRejected, crcCardId, error.getMessage())));
 
     }
 }

@@ -3,6 +3,8 @@ package crc.modeler.infrastructure;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -24,7 +26,7 @@ public class CommandHandlerTest {
 
         commandHandler.handleCommand(
                 null,
-                state -> Stream.of(nextEvent),
+                state -> Collections.singletonList(nextEvent),
                 anEventStore,
                 (state, event) -> state,
                 (state1, state2) -> state1);
@@ -41,7 +43,7 @@ public class CommandHandlerTest {
 
         commandHandler.handleCommand(
                 24L,
-                (Long state) -> state == 24L ? Stream.of(nextEvent) : Stream.<Event>empty(),
+                (Long state) -> state == 24L ? Collections.singletonList(nextEvent) : Collections.<Event>emptyList(),
                 anEventStore,
                 (state, event) -> state,
                 (state1, state2) -> state1);
@@ -59,7 +61,7 @@ public class CommandHandlerTest {
 
         commandHandler.handleCommand(
                 24L,
-                (Long state) -> state == 34L ? Stream.of(nextEvent) : Stream.<Event>empty(),
+                (Long state) -> state == 34L ? Collections.singletonList(nextEvent) : Collections.<Event>emptyList(),
                 anEventStore,
                 (state, event) -> Objects.equals("PastEventOccured", event.getEventType()) ? state + 10L : state,
                 (state1, state2) -> state1);
@@ -85,7 +87,7 @@ public class CommandHandlerTest {
             }
 
             @Override
-            public void appendEvents(Stream<Event> nextEvents) {
+            public void appendEvents(Collection<Event> nextEvents) {
                 nextEvents.forEach(appender);
             }
         };

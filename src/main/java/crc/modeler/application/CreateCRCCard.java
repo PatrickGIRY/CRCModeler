@@ -5,7 +5,8 @@ import crc.modeler.domain.EventType;
 import crc.modeler.infrastructure.Command;
 import crc.modeler.infrastructure.Event;
 
-import java.util.stream.Stream;
+import java.util.Collection;
+import java.util.Collections;
 
 public class CreateCRCCard implements Command<CRCCardId> {
     private final CRCCardId crcCardId;
@@ -15,7 +16,7 @@ public class CreateCRCCard implements Command<CRCCardId> {
     }
 
     @Override
-    public Stream<Event> decide(CRCCardId state) {
-        return Stream.of(Event.createEvent(EventType.CRCCardCreated, crcCardId));
+    public Collection<Event> decide(CRCCardId state) {
+        return Collections.singletonList(Event.createEvent(EventType.CRCCardCreated, crcCardId));
     }
 }

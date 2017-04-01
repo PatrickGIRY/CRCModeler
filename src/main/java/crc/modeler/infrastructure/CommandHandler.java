@@ -1,5 +1,6 @@
 package crc.modeler.infrastructure;
 
+import java.util.Collection;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.stream.Stream;
@@ -10,7 +11,7 @@ public class CommandHandler {
         if (command != null) {
             Stream<Event> pastEvents = eventStore.readEvents();
             T state = pastEvents.reduce(initialState, evolve, statesCombiner);
-            Stream<Event> newEvents = command.decide(state);
+            Collection<Event> newEvents = command.decide(state);
             eventStore.appendEvents(newEvents);
         }
     }

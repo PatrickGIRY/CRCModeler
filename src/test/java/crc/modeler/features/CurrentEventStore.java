@@ -4,6 +4,7 @@ import crc.modeler.infrastructure.Event;
 import crc.modeler.infrastructure.EventStore;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,7 +17,7 @@ public class CurrentEventStore implements EventStore {
     }
 
     @Override
-    public void appendEvents(Stream<Event> nextEvents) {
-        nextEvents.forEach(storedEvents::add);
+    public void appendEvents(Collection<Event> nextEvents) {
+        storedEvents.addAll(nextEvents);
     }
 }
