@@ -43,9 +43,9 @@ public class FileEventStore implements EventStore {
     }
 
     @Override
-    public void appendEvents(Collection<Event> nextEvents) {
+    public void appendEvents(Collection<Event> newEvents) {
         try (BufferedWriter bufferedWriter = Files.newBufferedWriter(path, CHARSET, CREATE, APPEND)) {
-            nextEvents.stream().map(this::toRecord).forEach(record -> {
+            newEvents.stream().map(this::toRecord).forEach(record -> {
                 try {
                     bufferedWriter.write(record);
                 } catch (IOException e) {

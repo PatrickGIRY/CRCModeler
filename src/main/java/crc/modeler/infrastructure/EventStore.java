@@ -6,5 +6,5 @@ import java.util.stream.Stream;
 public interface EventStore {
     Stream<Event> readEvents();
 
-    void appendEvents(Collection<Event> nextEvents);
+    void appendEvents(Collection<Event> newEvents);
 }

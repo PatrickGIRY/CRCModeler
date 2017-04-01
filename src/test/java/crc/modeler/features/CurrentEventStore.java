@@ -17,7 +17,7 @@ public class CurrentEventStore implements EventStore {
     }
 
     @Override
-    public void appendEvents(Collection<Event> nextEvents) {
-        storedEvents.addAll(nextEvents);
+    public void appendEvents(Collection<Event> newEvents) {
+        storedEvents.addAll(newEvents);
     }
 }
