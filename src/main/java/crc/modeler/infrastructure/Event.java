@@ -28,6 +28,10 @@ public class Event {
         return eventType;
     }
 
+    public <T> T getEventType(Class<T> eventTypeClass) {
+        return eventTypeClass.cast(getEventType());
+    }
+
     public Object getAggregateId() {
         return aggregateId;
     }
