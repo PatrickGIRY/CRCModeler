@@ -36,6 +36,10 @@ public class Event {
         return aggregateId;
     }
 
+    public <T> T getAggregateId(Class<T> aggregateIdClass) {
+        return aggregateIdClass.cast(aggregateId);
+    }
+
     public Object getData() {
         return data;
     }
