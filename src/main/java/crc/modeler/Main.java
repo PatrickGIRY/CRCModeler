@@ -106,6 +106,8 @@ public class Main {
                             System.out.printf("CRC card %s created\n", event.getAggregateId()));
                     put(EventType.CRCCardClassNameAdded, event ->
                             System.out.printf("CRC card %s named %s\n", event.getAggregateId(), event.getData()));
+                    put(EventType.CRCCardClassNameRejected, event ->
+                            System.out.printf("CRC card %s, ERROR: %s\n", event.getAggregateId(), event.getData()));
                 }};
 
         void print(Event event) {
