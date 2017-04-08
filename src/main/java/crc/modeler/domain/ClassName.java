@@ -12,19 +12,19 @@ public class ClassName {
     }
 
     public static Result<ClassName> of(String value) {
-        final Result<ClassName> className;
+        final Result<ClassName> result;
         if (value != null) {
             int startCodePoint = value.codePointAt(0);
             if (Character.isJavaIdentifierStart(startCodePoint) && !Character.isLowerCase(startCodePoint)
                     && value.codePoints().skip(1).allMatch(Character::isJavaIdentifierPart)) {
-                className = Result.success(new ClassName(value));
+                result = Result.success(new ClassName(value));
             } else {
-                className = Result.failure(new IllegalArgumentException(String.format("'%s' is not a valid class name", value)));
+                result = Result.failure(new InvalidClassNameException(value));
             }
         } else {
-            className = Result.failure(new IllegalArgumentException("This is not a valid class name"));
+            result = Result.failure(new InvalidClassNameException(null));
         }
-        return className;
+        return result;
     }
 
     public String value() {

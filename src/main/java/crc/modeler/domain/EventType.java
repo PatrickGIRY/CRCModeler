@@ -1,5 +1,5 @@
 package crc.modeler.domain;
 
 public enum EventType {
-    CRCCardClassNameAdded, CRCCardClassNameRejected, CRCCardCreated
+    CRCCardClassNameAdded, CRCCardClassNameRejected, CRCCardCreated, CRCCardRejected
 }

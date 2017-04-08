@@ -33,8 +33,7 @@ public class ClassNameTest {
         String s = String.valueOf((char) codePoint);
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
-        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(String.format("'%s' is not a valid class name", s));
+        assertThat(className.failureValue()).isInstanceOf(InvalidClassNameException.class);
     }
 
     @Property
@@ -43,8 +42,7 @@ public class ClassNameTest {
         String s = String.valueOf((char) codePoint);
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
-        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(String.format("'%s' is not a valid class name", s));
+        assertThat(className.failureValue()).isInstanceOf(InvalidClassNameException.class);
     }
 
     @Property
@@ -55,15 +53,13 @@ public class ClassNameTest {
         String s = String.valueOf((char) start).concat(part);
         Result<ClassName> className = ClassName.of(s);
         assertThat(className.isFailure()).isTrue();
-        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage(String.format("'%s' is not a valid class name", s));
+        assertThat(className.failureValue()).isInstanceOf(InvalidClassNameException.class);
     }
 
     @Test
     public void class_name_should_not_craated_when_value_is_null() throws Exception {
         Result<ClassName> className = ClassName.of(null);
         assertThat(className.isFailure()).isTrue();
-        assertThat(className.failureValue()).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("This is not a valid class name");
+        assertThat(className.failureValue()).isInstanceOf(InvalidClassNameException.class);
     }
 }

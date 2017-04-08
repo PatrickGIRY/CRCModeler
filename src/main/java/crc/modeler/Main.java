@@ -1,10 +1,10 @@
 package crc.modeler;
 
-import crc.modeler.application.AddClassNameToCRCCard;
 import crc.modeler.application.CreateCRCCard;
 import crc.modeler.domain.CRCCardId;
 import crc.modeler.domain.ClassName;
 import crc.modeler.domain.EventType;
+import crc.modeler.domain.InvalidClassNameException;
 import crc.modeler.infrastructure.CommandHandler;
 import crc.modeler.infrastructure.Event;
 import crc.modeler.infrastructure.EventStore;
@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -35,24 +34,12 @@ public class Main {
         EventStore eventStore = new FileEventStore(Paths.get("data.eventstore"));
         EventPrinter eventPrinter = new EventPrinter();
         CommandHandler commandHandler = new CommandHandler(eventStore);
-        Map<String, CRCCardId> userContext = new HashMap<>();
 
         List<CommandMatcher> commandMatchers = Arrays.asList(
-                new CommandMatcher(Pattern.compile("^new$"), groups -> {
+                new CommandMatcher(Pattern.compile("^new (.*)$"), groups -> {
                     Collection<Event> newEvents = commandHandler.handleCommand(
                             null,
-                            new CreateCRCCard(CRCCardId.nextCRCCardId()),
-                            (state, event) -> state,
-                            (state1, state2) -> state1);
-                    newEvents.forEach(event -> {
-                        userContext.put(CURRENT_CRC_CARD_ID_KEY, event.getAggregateId(CRCCardId.class));
-                        eventPrinter.print(event);
-                    });
-                }),
-                new CommandMatcher(Pattern.compile("^name (.*)$"), groups -> {
-                    Collection<Event> newEvents = commandHandler.handleCommand(
-                            null,
-                            new AddClassNameToCRCCard(userContext.get(CURRENT_CRC_CARD_ID_KEY), ClassName.of(groups[1])),
+                            new CreateCRCCard(CRCCardId.nextCRCCardId(), ClassName.of(groups[1])),
                             (state, event) -> state,
                             (state1, state2) -> state1);
                     newEvents.forEach(eventPrinter::print);
@@ -103,11 +90,12 @@ public class Main {
         private Map<EventType, Consumer<Event>> eventPrinterByType =
                 new EnumMap<EventType, Consumer<Event>>(EventType.class) {{
                     put(EventType.CRCCardCreated, event ->
-                            System.out.printf("CRC card %s created\n", event.getAggregateId()));
-                    put(EventType.CRCCardClassNameAdded, event ->
-                            System.out.printf("CRC card %s named %s\n", event.getAggregateId(), event.getData()));
-                    put(EventType.CRCCardClassNameRejected, event ->
-                            System.out.printf("CRC card %s, ERROR: %s\n", event.getAggregateId(), event.getData()));
+                            System.out.printf("CRC card %s named %s\n", event.getAggregateId(),
+                                    event.getData(ClassName.class).value()));
+                    put(EventType.CRCCardRejected, event ->
+                            System.out.printf("CRC card %s rejected with the following invalid class name %s\n",
+                                    event.getAggregateId(),
+                                    event.getData(InvalidClassNameException.class).getInvalidClassName()));
                 }};
 
         void print(Event event) {

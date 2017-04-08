@@ -44,6 +44,10 @@ public class Event {
         return data;
     }
 
+    public <T> T getData(Class<T> dataClass) {
+        return dataClass.cast(data);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
